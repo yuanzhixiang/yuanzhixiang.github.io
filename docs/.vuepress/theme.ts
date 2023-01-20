@@ -7,6 +7,18 @@ export default hopeTheme({
     name: "袁智翔",
     url: "/",
   },
+  // reference https://theme-hope.vuejs.press/zh/guide/layout/navbar.html#%E5%AF%BC%E8%88%AA%E6%A0%8F%E9%93%BE%E6%8E%A5
+  // navbar: ["/index.md", "/guide-started.md"],
+  navbar: [
+    {
+      text: "主页",
+      link: "/",
+    },
+    {
+      text: "归档",
+      link: "/guide-started.md"
+    }
+  ],
   darkmode: "disable",
   favicon: "/favicon.ico",
   repo: "yuanzhixiang/yuanzhixiang.github.io",
@@ -16,7 +28,7 @@ export default hopeTheme({
       Github: "https://github.com/yuanzhixiang",
       // Juejin: "https://juejin.cn/user/764915823154270/posts",
       Email: "i@yuanzhixiang.com",
-    }
+    },
   },
   plugins: {
     blog: true,

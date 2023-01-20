@@ -1,6 +1,0 @@
-# contributing
-
-contributing
-
-
-## 3
