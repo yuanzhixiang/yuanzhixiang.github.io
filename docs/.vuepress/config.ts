@@ -9,5 +9,6 @@ export default defineUserConfig({
   shouldPrefetch: false,
 
   plugins: [
+    // todo wait https://support.algolia.com/hc/en-us/requests/538272 finish, then config search
   ],
 });
