@@ -1,5 +1,6 @@
 import { hopeTheme } from "vuepress-theme-hope";
 
+// The vuepress-theme-hope website's address is https://theme-hope.vuejs.press/zh/
 export default hopeTheme({
   hostname: "https://yuanzhixiang.com",
   author: {
@@ -11,9 +12,11 @@ export default hopeTheme({
   // todo It's not work
   favicon: "/favicon.ico",
 
+  repo: "yuanzhixiang/yuanzhixiang.github.io",
   toc: true,
 
   plugins: {
+    // Configuration page is https://giscus.app/zh-CN
     comment: {
       provider: "Giscus",
 
