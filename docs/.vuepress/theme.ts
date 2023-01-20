@@ -8,14 +8,18 @@ export default hopeTheme({
     url: "/",
   },
   darkmode: "disable",
-
-  // todo It's not work
   favicon: "/favicon.ico",
-
   repo: "yuanzhixiang/yuanzhixiang.github.io",
   toc: true,
-
+  blog: {
+    medias: {
+      Github: "https://github.com/yuanzhixiang",
+      // Juejin: "https://juejin.cn/user/764915823154270/posts",
+      Email: "i@yuanzhixiang.com",
+    }
+  },
   plugins: {
+    blog: true,
     // Configuration page is https://giscus.app/zh-CN
     comment: {
       provider: "Giscus",
