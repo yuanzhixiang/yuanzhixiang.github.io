@@ -11,6 +11,8 @@ export default hopeTheme({
   // todo It's not work
   favicon: "/favicon.ico",
 
+  toc: true,
+
   plugins: {
     comment: {
       provider: "Giscus",
