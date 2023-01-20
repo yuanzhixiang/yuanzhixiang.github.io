@@ -10,5 +10,6 @@ export default defineUserConfig({
 
   plugins: [
     // todo wait https://support.algolia.com/hc/en-us/requests/538272 finish, then config search
+    //   config search application in https://www.algolia.com/apps/2DWPBX4F7Q/onboarding
   ],
 });
