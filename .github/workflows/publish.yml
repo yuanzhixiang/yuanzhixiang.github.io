@@ -1,9 +1,6 @@
 name: docs
 
 on:
-  # develop trigger
-  # push:
-  #   branches: [develop/**]
   pull_request:
     types: [closed]
 
