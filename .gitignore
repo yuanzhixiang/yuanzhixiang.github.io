@@ -3,3 +3,4 @@
 .cache
 pnpm-lock.yaml
 dist
+/.idea
