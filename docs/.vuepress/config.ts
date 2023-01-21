@@ -1,6 +1,6 @@
 import { defineUserConfig } from "vuepress";
 import theme from "./theme";
-import plantuml from "markdown-it-plantuml";
+import plantuml from "markdown-it-textual-uml"; 
 
 export default defineUserConfig({
   lang: "zh-CN",
