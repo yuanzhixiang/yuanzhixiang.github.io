@@ -2,10 +2,8 @@
   "name": "blog.yuanzhixiang.com",
   "version": "1.0.0",
   "description": "This is yuanzhixiang's blog by vuepress",
-  "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "docs:dev": "vuepress dev docs",
     "docs:build": "vuepress build docs"
   },

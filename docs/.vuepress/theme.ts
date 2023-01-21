@@ -8,7 +8,6 @@ export default hopeTheme({
     url: "/",
   },
   // reference https://theme-hope.vuejs.press/zh/guide/layout/navbar.html#%E5%AF%BC%E8%88%AA%E6%A0%8F%E9%93%BE%E6%8E%A5
-  // navbar: ["/index.md", "/guide-started.md"],
   navbar: [
     {
       text: "主页",
@@ -16,7 +15,7 @@ export default hopeTheme({
     },
     {
       text: "归档",
-      link: "/guide-started.md"
+      link: "/guide.md"
     }
   ],
   darkmode: "disable",
