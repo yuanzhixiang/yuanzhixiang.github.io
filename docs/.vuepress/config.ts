@@ -1,6 +1,7 @@
 import { defineUserConfig } from "vuepress";
 import theme from "./theme";
 import plantuml from "markdown-it-textual-uml";
+import { googleAnalyticsPlugin } from '@vuepress/plugin-google-analytics'
 
 export default defineUserConfig({
   lang: "zh-CN",
@@ -31,5 +32,11 @@ export default defineUserConfig({
   plugins: [
     // todo wait https://support.algolia.com/hc/en-us/requests/538272 finish, then config search
     //   config search application in https://www.algolia.com/apps/2DWPBX4F7Q/onboarding
+
+    // google statistics, https://analytics.google.com/
+    googleAnalyticsPlugin({
+      id: "G-GBCSBZ68FH",
+      debug: true
+    }),
   ],
 });
