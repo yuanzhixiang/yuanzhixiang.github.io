@@ -9,7 +9,7 @@ export default defineUserConfig({
   theme,
   shouldPrefetch: false,
   head: [
-    // baidu statistics
+    // baidu statistics, https://tongji.baidu.com/
     [
       "script",
       {},
