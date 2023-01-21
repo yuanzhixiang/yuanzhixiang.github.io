@@ -40,5 +40,11 @@ export default hopeTheme({
       category: "Comments",
       categoryId: "DIC_kwDOIzba3c4CTsnO",
     },
+
+    components: {
+      components: [
+        "BiliBili"
+      ]
+    }
   },
 });
