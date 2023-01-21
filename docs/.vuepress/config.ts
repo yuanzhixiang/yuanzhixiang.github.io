@@ -9,17 +9,19 @@ export default defineUserConfig({
   theme,
   shouldPrefetch: false,
   head: [
+    // baidu statistics
     [
-      'script', {}, `
-        var _hmt = _hmt || [];
+      "script",
+      {},
+      ` var _hmt = _hmt || [];
         (function() {
           var hm = document.createElement("script");
-          hm.src = "https://hm.baidu.com/hm.js?272e4030c6e0dc58f41b2000659a08ff";
+          hm.src = "https://hm.baidu.com/hm.js?e808d2e114a24440a6ed1a9d0f628193";
           var s = document.getElementsByTagName("script")[0];
           s.parentNode.insertBefore(hm, s);
         })();
-        `
-    ]
+      `,
+    ],
   ],
 
   extendsMarkdown: (md) => {
