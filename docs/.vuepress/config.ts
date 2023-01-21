@@ -10,7 +10,6 @@ export default defineUserConfig({
   shouldPrefetch: false,
 
   extendsMarkdown: (md) => {
-    md.set({ breaks: true });
     md.use(plantuml);
   },
 

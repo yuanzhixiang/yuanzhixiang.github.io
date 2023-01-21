@@ -11,7 +11,7 @@ test
 
 2
 
-```
+```plantuml
 @startuml
 用户 -> 认证中心: 登录操作
 认证中心 -> 缓存: 存放(key=token+ip,value=token)token
