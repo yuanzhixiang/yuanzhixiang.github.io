@@ -1,6 +1,7 @@
 import { defineUserConfig } from "vuepress";
 import theme from "./theme";
-import plantuml from "markdown-it-textual-uml"; 
+import plantuml from "markdown-it-textual-uml";
+import { googleAnalyticsPlugin } from '@vuepress/plugin-google-analytics'
 
 export default defineUserConfig({
   lang: "zh-CN",
@@ -8,6 +9,21 @@ export default defineUserConfig({
   description: "This is yuanzhixiang's blog",
   theme,
   shouldPrefetch: false,
+  head: [
+    // baidu statistics, https://tongji.baidu.com/
+    [
+      "script",
+      {},
+      ` var _hmt = _hmt || [];
+        (function() {
+          var hm = document.createElement("script");
+          hm.src = "https://hm.baidu.com/hm.js?e808d2e114a24440a6ed1a9d0f628193";
+          var s = document.getElementsByTagName("script")[0];
+          s.parentNode.insertBefore(hm, s);
+        })();
+      `,
+    ],
+  ],
 
   extendsMarkdown: (md) => {
     md.use(plantuml);
@@ -16,5 +32,11 @@ export default defineUserConfig({
   plugins: [
     // todo wait https://support.algolia.com/hc/en-us/requests/538272 finish, then config search
     //   config search application in https://www.algolia.com/apps/2DWPBX4F7Q/onboarding
+
+    // google statistics, https://analytics.google.com/
+    googleAnalyticsPlugin({
+      id: "G-GBCSBZ68FH",
+      debug: true
+    }),
   ],
 });
