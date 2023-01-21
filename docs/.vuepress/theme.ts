@@ -27,7 +27,7 @@ export default hopeTheme({
     medias: {
       Github: "https://github.com/yuanzhixiang",
       // Juejin: "https://juejin.cn/user/764915823154270/posts",
-      Email: "mailto:i@yuanzhixiang.com",
+      Email: "mailto:i@yuanzhixiang.com?subject=hello%20yuanzhixiang",
     },
   },
   plugins: {
