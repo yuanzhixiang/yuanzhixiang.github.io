@@ -1,5 +1,6 @@
 import { defineUserConfig } from "vuepress";
 import theme from "./theme";
+import plantuml from "markdown-it-plantuml";
 
 export default defineUserConfig({
   lang: "zh-CN",
@@ -7,6 +8,11 @@ export default defineUserConfig({
   description: "This is yuanzhixiang's blog",
   theme,
   shouldPrefetch: false,
+
+  extendsMarkdown: (md) => {
+    md.set({ breaks: true });
+    md.use(plantuml);
+  },
 
   plugins: [
     // todo wait https://support.algolia.com/hc/en-us/requests/538272 finish, then config search
