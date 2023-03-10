@@ -1,0 +1,46 @@
+import{_ as n,W as s,X as a,Y as t}from"./framework-cc0d0bf8.js";const e={},p=t(`<h1 id="clash-tunnel" tabindex="-1"><a class="header-anchor" href="#clash-tunnel" aria-hidden="true">#</a> clash tunnel</h1><h2 id="tunnel-概述" tabindex="-1"><a class="header-anchor" href="#tunnel-概述" aria-hidden="true">#</a> Tunnel 概述</h2><p>在计算机网络中，Tunnel是一种通过在不同的网络之间创建虚拟通道来进行数据传输的技术。Tunnel可以被用来隐藏数据的源和目的地，同时也可以用来绕过网络中的限制和防火墙。</p><p>Tunnel 可被用于以下场景：</p><ul><li>加密保护：Tunnel 可以用来加密和隐藏网络中的通信数据，从而保证通信的安全性和隐私性。</li><li>绕过限制：Tunnel 可以用来绕过网络中的限制和防火墙，访问被封锁的网站和服务。</li><li>负载均衡：Tunnel 可以用来实现负载均衡，将请求分发到多个服务器上进行处理。</li><li>网络加速：Tunnel 可以用来加速网络传输，通过对数据进行压缩和优化来减少传输时间和带宽占用。</li><li>数据中转：Tunnel 可以用来实现数据中转，将数据从一个网络传输到另一个网络。</li></ul><h2 id="代理连接" tabindex="-1"><a class="header-anchor" href="#代理连接" aria-hidden="true">#</a> 代理连接</h2><p>接下来，我们通过学习 Clash 的 TCP 连接源码，了解该功能的实现原理。在代码中，代理连接是通过 proxy.DialContext 函数来创建的。其中，DialContext 函数会创建一个新的连接并返回一个 net.Conn 接口类型的对象，该对象可以被用于数据传输。在目标连接创建后，通过将源连接和目标连接的数据进行双向拷贝，完成数据传输，从而达到 tunnel 的效果。同时，在实现过程中，还使用了一个巧妙的技巧——通过 ReadOnlyReader 和 WriteOnlyWriter 对连接进行包装，避免使用 net.TCPConn 的 ReadFrom 方法，从而提高了性能。在进行数据传输的过程中，还使用了多个 goroutine 进行调度和优化，提高了程序的运行效率。</p><div class="language-go line-numbers-mode" data-ext="go"><pre class="language-go"><code><span class="token comment">// context/conn.go</span>
+<span class="token keyword">type</span> ConnContext <span class="token keyword">struct</span> <span class="token punctuation">{</span>
+	id       uuid<span class="token punctuation">.</span>UUID
+	metadata <span class="token operator">*</span>C<span class="token punctuation">.</span>Metadata
+	conn     net<span class="token punctuation">.</span>Conn
+<span class="token punctuation">}</span>
+
+<span class="token comment">// tunnel/tunnel.go</span>
+<span class="token comment">// 连接建立时会调用这个方法，connCtx 中的 conn 就是连接到 clash 的连接</span>
+<span class="token keyword">func</span> <span class="token function">handleTCPConn</span><span class="token punctuation">(</span>connCtx C<span class="token punctuation">.</span>ConnContext<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  metadata <span class="token operator">:=</span> connCtx<span class="token punctuation">.</span><span class="token function">Metadata</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+  <span class="token comment">// ...</span>
+
+  <span class="token comment">// metadata 中存放着源地址和目标地址，进入该函数后会使用远程地址创建连接并将其返回，也就是 remoteConn</span>
+  remoteConn<span class="token punctuation">,</span> err <span class="token operator">:=</span> proxy<span class="token punctuation">.</span><span class="token function">DialContext</span><span class="token punctuation">(</span>ctx<span class="token punctuation">,</span> metadata<span class="token punctuation">.</span><span class="token function">Pure</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+  <span class="token comment">// 远程连接建立后通过调用 handleSocket 方法完成对数据的双向拷贝</span>
+  <span class="token function">handleSocket</span><span class="token punctuation">(</span>connCtx<span class="token punctuation">,</span> remoteConn<span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment">// tunnel/connection.go</span>
+<span class="token keyword">import</span> <span class="token punctuation">(</span>
+  N <span class="token string">&quot;github.com/Dreamacro/clash/common/net&quot;</span>
+<span class="token punctuation">)</span>
+<span class="token keyword">func</span> <span class="token function">handleSocket</span><span class="token punctuation">(</span>ctx C<span class="token punctuation">.</span>ConnContext<span class="token punctuation">,</span> outbound net<span class="token punctuation">.</span>Conn<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+	N<span class="token punctuation">.</span><span class="token function">Relay</span><span class="token punctuation">(</span>ctx<span class="token punctuation">.</span><span class="token function">Conn</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> outbound<span class="token punctuation">)</span>
+<span class="token punctuation">}</span>
+
+<span class="token comment">// common/net/relay.go</span>
+<span class="token comment">// Relay copies between left and right bidirectionally.</span>
+<span class="token keyword">func</span> <span class="token function">Relay</span><span class="token punctuation">(</span>leftConn<span class="token punctuation">,</span> rightConn net<span class="token punctuation">.</span>Conn<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+	ch <span class="token operator">:=</span> <span class="token function">make</span><span class="token punctuation">(</span><span class="token keyword">chan</span> <span class="token builtin">error</span><span class="token punctuation">)</span>
+
+  <span class="token comment">// 开启携程从目标服务器读取的数据写入源客户端</span>
+	<span class="token keyword">go</span> <span class="token keyword">func</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+		<span class="token boolean">_</span><span class="token punctuation">,</span> err <span class="token operator">:=</span> io<span class="token punctuation">.</span><span class="token function">Copy</span><span class="token punctuation">(</span>WriteOnlyWriter<span class="token punctuation">{</span>Writer<span class="token punctuation">:</span> leftConn<span class="token punctuation">}</span><span class="token punctuation">,</span> ReadOnlyReader<span class="token punctuation">{</span>Reader<span class="token punctuation">:</span> rightConn<span class="token punctuation">}</span><span class="token punctuation">)</span>
+		leftConn<span class="token punctuation">.</span><span class="token function">SetReadDeadline</span><span class="token punctuation">(</span>time<span class="token punctuation">.</span><span class="token function">Now</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+		ch <span class="token operator">&lt;-</span> err
+	<span class="token punctuation">}</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+  <span class="token comment">// 从源客户端读取的数据写入目标服务器</span>
+	io<span class="token punctuation">.</span><span class="token function">Copy</span><span class="token punctuation">(</span>WriteOnlyWriter<span class="token punctuation">{</span>Writer<span class="token punctuation">:</span> rightConn<span class="token punctuation">}</span><span class="token punctuation">,</span> ReadOnlyReader<span class="token punctuation">{</span>Reader<span class="token punctuation">:</span> leftConn<span class="token punctuation">}</span><span class="token punctuation">)</span>
+	rightConn<span class="token punctuation">.</span><span class="token function">SetReadDeadline</span><span class="token punctuation">(</span>time<span class="token punctuation">.</span><span class="token function">Now</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+	<span class="token operator">&lt;-</span>ch
+<span class="token punctuation">}</span>
+</code></pre><div class="line-numbers" aria-hidden="true"><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div><div class="line-number"></div></div></div><h1 id="总结" tabindex="-1"><a class="header-anchor" href="#总结" aria-hidden="true">#</a> 总结</h1><p>Clash 的 Tunnel 功能可以用于加密保护、绕过限制、负载均衡、网络加速和数据中转等场景。Tunnel 功能是一个强大的网络传输技术，为用户提供了一种安全、高效、稳定的数据传输方式。</p>`,10),o=[p];function c(l,i){return s(),a("div",null,o)}const d=n(e,[["render",c],["__file","clash-tunnel.html.vue"]]);export{d as default};
